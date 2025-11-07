@@ -1,0 +1,65 @@
+{
+  "name": "@swader/x402facilitators",
+  "version": "0.0.8",
+  "description": "x402 facilitator configuration and validation utilities",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js"
+    }
+  },
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "dist/**/*.d.ts.map",
+    "!dist/index.html",
+    "!dist/*.webp",
+    "!dist/CNAME",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "bun run build:lib && bun run build:website",
+    "build:lib": "rm -rf dist/*.js dist/*.d.ts dist/*.d.ts.map && bun build src/index.ts --outdir dist --target bun --format esm --sourcemap=external && bun build src/types.ts --outdir dist --target bun --format esm --sourcemap=external && bun x tsc -p tsconfig.build.json",
+    "build:website": "bun run website/build.ts",
+    "dev": "bun run build:website && cd dist && bun --hot",
+    "serve": "cd dist && bun --port 8080 index.html",
+    "check:types": "bun x tsc --noEmit",
+    "lint": "eslint",
+    "prepublishOnly": "bun run build:lib"
+  },
+  "keywords": [
+    "x402",
+    "facilitator",
+    "blockchain",
+    "payments",
+    "web3"
+  ],
+  "author": "Swader",
+  "license": "MIT",
+  "homepage": "https://facilitators.x402.watch",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Swader/x402facilitators.git"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.44.1"
+  },
+  "dependencies": {
+    "@coinbase/x402": "^0.6.6",
+    "x402": "^0.6.6"
+  }
+}

@@ -1,0 +1,152 @@
+name: Release and Publish
+
+on:
+  release:
+    types: [created, published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Run without publishing (dry-run)'
+        required: false
+        default: 'false'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write  # Required for npm provenance and GitHub Pages
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+          
+      - name: Setup Node.js (for npm)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm (ensure latest provenance support)
+        run: npm install -g npm@latest
+      
+      - name: Verify npm version and OIDC support
+        run: |
+          npm --version
+          echo "Checking for OIDC environment variables..."
+          if [ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ]; then
+            echo "✓ OIDC token URL is available"
+          else
+            echo "✗ OIDC token URL is NOT available"
+          fi
+          
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+        
+      - name: Build library
+        run: bun run build:lib
+        
+      - name: Verify library build output
+        run: |
+          if [ ! -f dist/index.js ]; then
+            echo "Error: dist/index.js not found"
+            exit 1
+          fi
+          echo "✅ Library build successful!"
+          echo "Build artifact sizes:"
+          ls -lh dist/index.js dist/types.js
+          
+      - name: Verify TypeScript declarations
+        run: |
+          if [ ! -f dist/index.d.ts ]; then
+            echo "Error: dist/index.d.ts not found"
+            exit 1
+          fi
+          echo "✅ TypeScript declarations generated"
+          
+      - name: Upload library artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: library-build-${{ github.sha }}
+          path: |
+            dist/**/*.js
+            dist/**/*.d.ts
+            dist/**/*.d.ts.map
+            dist/**/*.js.map
+            package.json
+            README.md
+            LICENSE
+          retention-days: 30
+          
+      - name: Pack for inspection
+        run: npm pack
+        
+      - name: Upload tarball artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-package-${{ github.sha }}
+          path: "*.tgz"
+          retention-days: 90
+          
+      - name: Publish to npm (dry-run)
+        if: github.event.inputs.dry_run == 'true'
+        run: npm publish --dry-run --access public --provenance
+        
+      - name: Publish to npm (with provenance via OIDC)
+        if: github.event_name == 'release'
+        run: npm publish --access public --provenance
+        
+      - name: Verify publication
+        if: github.event_name == 'release'
+        run: |
+          sleep 10
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          npm view "$PACKAGE_NAME" version
+          echo "✅ Published to npm successfully!"
+          
+  deploy-website:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build website
+        run: bun run build:website
+
+      - name: Add CNAME file
+        run: echo "facilitators.x402.watch" > dist/CNAME
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        
+      - name: Confirm deployment
+        run: |
+          echo "✅ Website deployed to GitHub Pages"
+          echo "🌐 URL: ${{ steps.deployment.outputs.page_url }}"
+

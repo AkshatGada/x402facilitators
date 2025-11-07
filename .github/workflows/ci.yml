@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+          
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+        
+      - name: Type check
+        run: bun run check:types
+        
+      - name: Lint
+        run: bun run lint
+        
+      - name: Build library
+        run: bun run build:lib
+        
+      - name: Verify library build
+        run: |
+          if [ ! -f dist/index.js ]; then
+            echo "Error: dist/index.js not found"
+            exit 1
+          fi
+          if [ ! -f dist/index.d.ts ]; then
+            echo "Error: dist/index.d.ts not found"
+            exit 1
+          fi
+          echo "✅ Library build successful!"
+          echo "Build artifact sizes:"
+          ls -lh dist/index.js dist/types.js
+          
+      - name: Build website
+        run: bun run build:website
+        
+      - name: Verify website build
+        run: |
+          if [ ! -f dist/index.html ]; then
+            echo "Error: dist/index.html not found"
+            exit 1
+          fi
+          echo "✅ Website build successful!"
+          
+      - name: Verify package contents
+        run: |
+          npm pack --dry-run
+          echo "✅ Package verification complete"
+

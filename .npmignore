@@ -1,0 +1,36 @@
+# Development files
+node_modules
+src
+*.ts
+!*.d.ts
+tsconfig.json
+.turbo
+*.tsbuildinfo
+
+# Website build output (not needed in npm package)
+website/
+assets/
+CNAME
+dist/CNAME
+dist/index.html
+dist/base.webp
+dist/polygon.webp
+dist/solana.webp
+
+# GitHub and deployment
+.github/
+DEPLOYMENT.md
+
+# Development configs
+eslint.config.mjs
+.gitignore
+.cursorignore
+
+# Build and dev scripts
+serve.sh
+bun.lock
+
+# Logs and misc
+*.log
+.DS_Store
+CHANGES.md
