@@ -234,7 +234,7 @@ async function build() {
   try {
     await copyFile(CNAME_PATH, join(OUTPUT_DIR, 'CNAME'));
     console.log('📄 Copied CNAME file');
-  } catch (error) {
+  } catch {
     console.log('⚠️  No CNAME file found (skipping)');
   }
 

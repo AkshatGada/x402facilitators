@@ -60,7 +60,7 @@ to guarantee uptime. Simply import and use it directly - no configuration
 required:
 
 ```typescript
-import { auto } from 'facilitators';
+import { auto } from '@swader/x402facilitators';
 
 paymentMiddleware(address, resources, auto);
 ```
@@ -75,7 +75,7 @@ This is useful for building agents that search for tools.
 ### Discovery API
 
 ```typescript
-import { coinbaseDiscovery, listAllFacilitatorResources } from 'facilitators';
+import { coinbaseDiscovery, listAllFacilitatorResources } from '@swader/x402facilitators';
 
 // List all resources from a facilitator
 const resources = await listAllFacilitatorResources(coinbaseDiscovery);
@@ -99,7 +99,7 @@ The package also exports a list of all facilitators that support discovery:
 import {
   discoverableFacilitators,
   listAllFacilitatorResources,
-} from 'facilitators';
+} from '@swader/x402facilitators';
 
 await Promise.all(
   discoverableFacilitators.map(facilitator =>
@@ -149,10 +149,10 @@ import {
   codenut,
   ultravioletadao,
   virtuals
-} from 'facilitators';
+} from '@swader/x402facilitators';
 
 // Facilitators requiring setup
-import { aurracloud, thirdweb, questflow } from 'facilitators';
+import { aurracloud, thirdweb, questflow } from '@swader/x402facilitators';
 
 aurracloud({
   apiKey: process.env.AURRACLOUD_API_KEY,
@@ -170,7 +170,7 @@ thirdweb({
 ### Access Facilitator Metadata
 
 ```typescript
-import { coinbaseFacilitator, payaiFacilitator } from 'facilitators';
+import { coinbaseFacilitator, payaiFacilitator } from '@swader/x402facilitators';
 
 console.log(coinbaseFacilitator);
 // {
@@ -227,7 +227,7 @@ type FacilitatorConfigConstructor<Props = void> = (
 **Example - Simple facilitator (no setup required):**
 
 ```typescript
-import { payai } from 'facilitators';
+import { payai } from '@swader/x402facilitators';
 
 // Use directly - just a URL configuration
 paymentMiddleware(address, resources, payai);
@@ -236,7 +236,7 @@ paymentMiddleware(address, resources, payai);
 **Example - Facilitator with required props:**
 
 ```typescript
-import { aurracloud } from 'facilitators';
+import { aurracloud } from '@swader/x402facilitators';
 
 // Must call with required props first
 paymentMiddleware(
