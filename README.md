@@ -121,8 +121,7 @@ This package includes pre-configured integrations for the following X402 facilit
 | **PayAI**      | BASE, SOLANA  | ✅ Yes    | No                             |
 | **Daydreams**  | BASE, SOLANA  | No        | No                             |
 | **X402rs**     | BASE, POLYGON | No        | No                             |
-| **Polygon**    | POLYGON       | No        | 
-No                             |
+| **Polygon**    | POLYGON       | No        | No                             |
 | **Corbits**    | SOLANA        | No        | No                             |
 | **Dexter**     | SOLANA        | No        | No                             |
 | **Mogami**     | BASE          | No        | No                             |
